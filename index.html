@@ -51,7 +51,6 @@
             text-decoration: line-through;
             color: #888 !important; 
             opacity: 0.8;
-            /* استخدام فئة تايوليند (محدد مسبقاً) لخلفية المهمة المكتملة */
         }
         
         /* زر التراجع (لون يتم تحديثه ديناميكياً) */
@@ -178,7 +177,8 @@
             const setGoldThemeBtn = document.getElementById('setGoldThemeBtn');
 
             let errorTimeout; 
-
+            const STORAGE_KEY = 'fikerTasks'; // مفتاح حفظ المهام
+            
             // قائمة الآيات الملهمة (مختصرة)
             const quranicVerses = [
                 "فَاصْبِرْ إِنَّ وَعْدَ اللَّهِ حَقٌّ ۖ", 
@@ -264,6 +264,7 @@
                     clearTimeout(errorTimeout);
                 }
                 
+                // يتم تحديث ألوان رسالة الخطأ عبر updateThemeElements
                 errorMessage.querySelector('span').textContent = message;
                 errorMessage.classList.remove('hidden');
 
@@ -271,22 +272,43 @@
                     errorMessage.classList.add('hidden');
                 }, 3000);
             }
+            
+            /* ------------------------------------------------------------------ */
+            /* دوال حفظ وتحميل المهام محلياً (localStorage) */
+            /* ------------------------------------------------------------------ */
+            
+            function saveTasks() {
+                const tasks = [];
+                taskList.querySelectorAll('li').forEach(li => {
+                    tasks.push({
+                        text: li.querySelector('.task-text').textContent,
+                        isCompleted: li.querySelector('.task-text').classList.contains('completed-task')
+                    });
+                });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+            }
 
-            function addTask() {
-                const taskText = taskInput.value.trim(); 
-
-                if (taskText === '') {
-                    showErrorMessage('الرجاء إدخال نص للمهمة.');
-                    return; 
+            function loadTasks() {
+                const savedTasks = localStorage.getItem(STORAGE_KEY);
+                if (savedTasks) {
+                    const tasks = JSON.parse(savedTasks);
+                    tasks.forEach(task => {
+                        createTaskElement(task.text, task.isCompleted);
+                    });
                 }
-                
+            }
+
+            /* ------------------------------------------------------------------ */
+            /* دالة إنشاء عنصر المهمة (تم تعديلها لاستقبال حالة الإكمال) */
+            /* ------------------------------------------------------------------ */
+            function createTaskElement(taskText, isCompleted = false) {
                 const randomVerse = getRandomVerse();
                 const currentTheme = body.classList.contains('pink-theme') ? 'pink' : 'yellow';
 
                 // إنشاء عنصر القائمة (li)
                 const li = document.createElement('li');
                 li.className = 'flex items-start justify-between bg-gray-100 p-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-[1.02] shadow-sm';
-
+                
                 // حاوية النص والآية
                 const textContainer = document.createElement('div');
                 textContainer.className = 'flex flex-col sm:flex-row items-start sm:items-center flex-grow';
@@ -309,26 +331,26 @@
 
                 // 1. زر "تم بحمد الله" (يستخدم أيضاً للتراجع)
                 const completeBtn = document.createElement('button');
-                completeBtn.textContent = 'تم بحمد الله';
-                completeBtn.className = 'text-sm text-green-600 hover:text-green-800 font-semibold transition whitespace-nowrap'; 
-
+                
                 // 2. زر "حذف"
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = 'حذف';
                 deleteBtn.className = 'text-sm text-red-500 hover:text-red-700 font-semibold transition whitespace-nowrap'; 
 
                 // منطق الإكمال (زر "تم بحمد الله")
-                completeBtn.addEventListener('click', () => {
-                    const isCompleted = taskSpan.classList.toggle('completed-task'); 
+                const toggleComplete = () => {
+                    const isNowCompleted = !taskSpan.classList.contains('completed-task');
+                    
+                    taskSpan.classList.toggle('completed-task', isNowCompleted);
                     
                     // تحديث خلفية الـ li بلون خفيف
                     if (currentTheme === 'pink') {
-                         li.classList.toggle('bg-rose-50'); 
+                         li.classList.toggle('bg-rose-50', isNowCompleted); 
                     } else {
-                         li.classList.toggle('bg-green-50'); 
+                         li.classList.toggle('bg-green-50', isNowCompleted); 
                     }
                     
-                    if (isCompleted) {
+                    if (isNowCompleted) {
                         completeBtn.textContent = 'تراجع';
                         // استخدام اللون العكسي (لون الثيم) لزر التراجع
                         completeBtn.className = `text-sm theme-btn-reverse text-${currentTheme}-600 font-semibold transition whitespace-nowrap`; 
@@ -337,11 +359,15 @@
                         // العودة إلى اللون الأخضر للإنجاز
                         completeBtn.className = 'text-sm text-green-600 hover:text-green-800 font-semibold transition whitespace-nowrap'; 
                     }
-                });
+                    saveTasks(); // **حفظ الحالة بعد التعديل**
+                };
+
+                completeBtn.addEventListener('click', toggleComplete);
 
                 // منطق الحذف (زر "حذف")
                 deleteBtn.addEventListener('click', () => {
                     li.remove();
+                    saveTasks(); // **حفظ الحالة بعد الحذف**
                 });
 
                 // تجميع العناصر
@@ -355,13 +381,39 @@
                 li.appendChild(buttonsContainer);
                 taskList.appendChild(li);
 
+                // تطبيق حالة الإكمال إذا كانت موجودة من الدالة loadTasks
+                if (isCompleted) {
+                    // يتم تشغيل التبديل مرة واحدة لتطبيق الفئات
+                    toggleComplete(); 
+                } else {
+                    // تطبيق حالة البداية (غير مكتمل)
+                    completeBtn.textContent = 'تم بحمد الله';
+                    completeBtn.className = 'text-sm text-green-600 hover:text-green-800 font-semibold transition whitespace-nowrap'; 
+                }
+            }
+            
+            function addTask() {
+                const taskText = taskInput.value.trim(); 
+
+                if (taskText === '') {
+                    showErrorMessage('الرجاء إدخال نص للمهمة.');
+                    return; 
+                }
+                
+                createTaskElement(taskText);
+                saveTasks(); // **حفظ الحالة بعد الإضافة**
+
                 taskInput.value = '';
                 taskInput.focus();
             }
-
+            /* ------------------------------------------------------------------ */
+            
             // تحميل الثيم عند بدء التشغيل
             const savedTheme = localStorage.getItem('appTheme') || 'gold-theme';
             setTheme(savedTheme);
+            
+            // **تحميل المهام عند بدء التشغيل**
+            loadTasks();
 
             // إضافة المستمعين للأزرار
             setPinkThemeBtn.addEventListener('click', () => setTheme('pink-theme'));
@@ -377,4 +429,5 @@
     </script>
 
 </body>
-</html>
+    </html>
+    
