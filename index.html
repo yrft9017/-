@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فكر - قائمة المهام</title>
     
-    <!-- تحميل Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- تحميل الخطوط العربية -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -21,94 +19,141 @@
             padding: 0;
         }
 
-        /* تطبيق الخطوط والتصميم الأساسي */
+        /* ------------------------------------------------------------------ */
+        /* تعريف متغيرات الألوان التابعة للثيمات لـ (الخلفية فقط) */
+        /* ------------------------------------------------------------------ */
+        :root {
+            --dot-color: #D4AF37; /* Default Gold */
+            --float-bg-color: rgba(212, 175, 55, 0.2);
+        }
+
+        body.pink-theme {
+            --dot-color: #EC4899; /* Pink */
+            --float-bg-color: rgba(236, 72, 153, 0.2);
+        }
+        
         body {
-            /* خلفية سوداء خالصة مع نقاط ذهبية */
-            background-color: #000000;
+            /* خلفية بيضاء ثابتة مع نقاط متغيرة اللون */
+            background-color: #ffffff; 
             background-image: 
-                radial-gradient(circle at 1px 1px, #D4AF37 1px, transparent 0); /* D4AF37 لون ذهبي */
+                radial-gradient(circle at 1px 1px, var(--dot-color) 1px, transparent 0); 
             background-size: 25px 25px;
             
             font-family: 'Amiri', serif;
-            color: #f0f0f0; 
-        }
-
-        /* توحيد خط العنوان الرئيسي ليصبح مثل خط الآيات (Amiri) */
-        h1 {
-            font-family: 'Amiri', serif;
-        }
-        
-        /* تصميم انتقال ناعم لتأثير الشطب وتغيير اللون */
-        .task-text {
-            /* تطبيق الانتقال على اللون وتأثير الشطب (إذا كان متوفراً في المتصفح) */
-            transition: color 0.3s ease-in-out, opacity 0.3s ease-in-out; 
-            display: inline-block;
+            color: #333333; 
+            overflow-x: hidden; 
+            position: relative; 
+            transition: all 0.5s ease-in-out; 
         }
 
         /* حالة المهمة المكتملة */
         .completed-task {
             text-decoration: line-through;
-            color: #555 !important; /* لون رمادي خفيف بعد الانتهاء */
-            opacity: 0.7;
+            color: #888 !important; 
+            opacity: 0.8;
+            /* استخدام فئة تايوليند (محدد مسبقاً) لخلفية المهمة المكتملة */
+        }
+        
+        /* زر التراجع (لون يتم تحديثه ديناميكياً) */
+        .theme-btn-reverse { transition: color 0.3s; }
+        .theme-btn-reverse:hover { opacity: 0.8; }
+        
+        /* ---------------------------------------------------- */
+        /* عناصر الحركة في الخلفية */
+        /* ---------------------------------------------------- */
+        
+        @keyframes float-up {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-50vh) rotate(360deg); opacity: 0.1; }
         }
 
-        /* تعديل لون شريط التمرير (اختياري) */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .floating-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1; 
         }
-        ::-webkit-scrollbar-track {
-            background: #2d2d2d;
+        
+        .floating-element {
+            position: absolute;
+            display: block;
+            list-style: none;
+            background: var(--float-bg-color); /* استخدام متغير اللون */
+            animation: float-up 25s linear infinite;
+            bottom: -150px;
+            border-radius: 3px; 
         }
-        ::-webkit-scrollbar-thumb {
-            background: #D4AF37;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #b89b34;
-        }
+        /* تحديد مواقع وأحجام عناصر الحركة */
+        .floating-element:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-duration: 25s; }
+        .floating-element:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-duration: 12s; animation-delay: 2s; border-radius: 50%; } 
+        .floating-element:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-duration: 15s; animation-delay: 4s; }
+        .floating-element:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-duration: 20s; animation-delay: 0s; border-radius: 50%; } 
+        .floating-element:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-duration: 10s; animation-delay: 0s; }
+        .floating-element:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-duration: 35s; animation-delay: 3s; border-radius: 50%; } 
     </style>
 </head>
 <body> 
+    
+    <div class="floating-background">
+        <li class="floating-element"></li>
+        <li class="floating-element"></li>
+        <li class="floating-element"></li>
+        <li class="floating-element"></li>
+        <li class="floating-element"></li>
+        <li class="floating-element"></li>
+    </div>
 
     <div class="container mx-auto max-w-lg mt-12 mb-12 p-6">
         
-        <!-- تعديل البطاقة الرئيسية لتتناسب مع التصميم الداكن -->
-        <div class="bg-gray-900 bg-opacity-90 backdrop-blur-sm border border-gray-700 rounded-xl shadow-lg p-6">
+        <div class="flex justify-center gap-4 mb-6">
+            <button 
+                id="setPinkThemeBtn" 
+                class="bg-pink-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md hover:bg-pink-600 transition"
+            >
+                ✨ وضع البنات (وردي)
+            </button>
+            <button 
+                id="setGoldThemeBtn" 
+                class="bg-yellow-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md hover:bg-yellow-700 transition"
+            >
+                👑 الوضع الكلاسيكي (ذهبي)
+            </button>
+        </div>
+        
+        <div class="bg-white bg-opacity-95 border border-gray-300 rounded-xl shadow-xl p-6">
             
-            <!-- العنوان: "فكر" باللون الذهبي -->
-            <h1 class="text-5xl font-bold text-center text-yellow-400 mb-4" style="font-family: 'Amiri', serif;">فِكر</h1>
+            <h1 id="mainTitle" class="text-5xl font-bold text-center mb-4" style="font-family: 'Amiri', serif;">فِكر</h1>
 
-            <!-- الآيات القرآنية الملهمة الرئيسية -->
             <div class="text-center my-6 space-y-3">
-                <p class="text-xl text-yellow-500" style="font-family: 'Amiri', serif;">"وَأَن لَّيْسَ لِلإِنسَانِ إِلَّا مَا سَعَىٰ"</p>
-                <p class="text-lg text-yellow-600" style="font-family: 'Amiri', serif;">"إِنَّ مَعَ الْعُسْرِ يُسْرًا"</p>
+                <p id="verseText1" class="text-xl" style="font-family: 'Amiri', serif;">"وَأَن لَّيْسَ لِلإِنسَانِ إِلَّا مَا سَعَىٰ"</p>
+                <p id="verseText2" class="text-lg" style="font-family: 'Amiri', serif;">"إِنَّ مَعَ الْعُسْرِ يُسْرًا"</p>
             </div>
 
-            <!-- نموذج الإدخال (بتصميم داكن وذهبي) -->
             <div class="flex flex-col sm:flex-row gap-2 mb-4">
                 <input 
                     type="text" 
                     id="taskInput" 
                     placeholder="أضف مهمة جديدة..." 
-                    class="flex-grow p-3 bg-gray-800 border border-gray-600 text-gray-100 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+                    class="flex-grow p-3 bg-gray-50 border border-gray-400 text-gray-900 placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 transition"
                 >
                 <button 
                     id="addTaskBtn" 
-                    class="w-full sm:w-auto bg-yellow-600 text-gray-900 px-6 py-3 rounded-lg font-bold hover:bg-yellow-500 transition shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-75"
+                    class="w-full sm:w-auto text-white px-6 py-3 rounded-lg font-bold shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition"
                 >
                     إضافة
                 </button>
             </div>
 
-            <!-- قائمة المهام -->
             <ul id="taskList" class="space-y-3">
-                <!-- المهام ستضاف هنا عبر جافاسكريبت -->
-            </ul>
+                </ul>
 
         </div>
 
-        <!-- رسالة الخطأ (بتصميم ذهبي) -->
-        <div id="error-message" class="hidden fixed top-5 left-1/2 -translate-x-1/2 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg shadow-lg" role="alert">
+        <div id="error-message" class="hidden fixed top-5 left-1/2 -translate-x-1/2 px-4 py-3 rounded-lg shadow-lg" role="alert">
             <strong class="font-bold">خطأ!</strong>
             <span class="block sm:inline">الرجاء إدخال نص للمهمة.</span>
         </div>
@@ -118,125 +163,100 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
+            // العناصر الرئيسية
             const taskInput = document.getElementById('taskInput');
             const addTaskBtn = document.getElementById('addTaskBtn');
             const taskList = document.getElementById('taskList');
             const errorMessage = document.getElementById('error-message');
+            const body = document.body;
+            const mainTitle = document.getElementById('mainTitle');
+            const verseText1 = document.getElementById('verseText1');
+            const verseText2 = document.getElementById('verseText2');
+            
+            // أزرار الثيم
+            const setPinkThemeBtn = document.getElementById('setPinkThemeBtn');
+            const setGoldThemeBtn = document.getElementById('setGoldThemeBtn');
+
             let errorTimeout; 
 
-            // قائمة واسعة بالآيات الملهمة والبهيجة (حوالي 100 آية)
+            // قائمة الآيات الملهمة (مختصرة)
             const quranicVerses = [
                 "فَاصْبِرْ إِنَّ وَعْدَ اللَّهِ حَقٌّ ۖ", 
                 "وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ", 
                 "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ", 
-                "عَسَىٰ رَبُّنَا أَن يُبْدِلَنَا خَيْرًا مِّنْهَا", 
-                "إِنَّ اللَّهَ لَا يُضِيعُ أَجْرَ الْمُحْسِنِينَ", 
-                "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا",
-                "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
-                "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
-                "لَا تَدْرِي لَعَلَّ اللَّهَ يُحْدِثُ بَعْدَ ذَٰلِكَ أَمْرًا",
                 "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
-                "كَتَبَ رَبُّكُمْ عَلَىٰ نَفْسِهِ الرَّحْمَةَ",
+                "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
                 "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
-                "ادْعُونِي أَسْتَجِبْ لَكُمْ",
-                "إِنَّ رَحْمَتَ اللَّهِ قَرِيبٌ مِّنَ الْمُحْسِنِينَ",
-                "فَاسْتَبِقُوا الْخَيْرَاتِ",
                 "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
-                "فَإِذَا عَزَمْتَ فَتَوَكَّلْ عَلَى اللَّهِ",
                 "وَبَشِّرِ الصَّابِرِينَ",
-                "وَلَا تَيْأَسُوا مِن رَّوْحِ اللَّهِ",
-                "وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ",
-                "وَعَسَى أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ",
-                "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ",
-                "وَتَوَكَّلْ عَلَى الْحَيِّ الَّذِي لَا يَمُوتُ",
-                "وَمَا عِندَ اللَّهِ خَيْرٌ لِّلْأَبْرَارِ",
-                "سَلَامٌ عَلَيْكُم بِمَا صَبَرْتُمْ فَنِعْمَ عُقْبَى الدَّارِ",
-                "إِنَّ اللَّهَ مَعَ الَّذِينَ اتَّقَوا وَّالَّذِينَ هُم مُّحْسِنُونَ",
-                "وَلَا تَحْزَنْ عَلَيْهِمْ وَلَا تَكُ فِي ضَيْقٍ مِّمَّا يَمْكُرُونَ",
-                "وَقُل رَّبِّ زِدْنِي عِلْمًا",
-                "فَذَكِّرْ إِنَّمَا أَنتَ مُذَكِّرٌ",
-                "وَسَارِعُوا إِلَىٰ مَغْفِرَةٍ مِّن رَّبِّكُمْ",
-                "وَاللَّهُ يَدْعُو إِلَىٰ دَارِ السَّلَامِ",
-                "إِنَّ اللَّهَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
-                "وَأُفَوِّضُ أَمْرِي إِلَى اللَّهِ",
-                "فَاصْبِرْ صَبْرًا جَمِيلًا",
-                "يُؤْتِي الْحِكْمَةَ مَن يَشَاءُ",
-                "لَا يَسْأَمُ الْإِنسَانُ مِن دُعَاءِ الْخَيْرِ",
-                "فَاصْبِرْ عَلَىٰ مَا يَقُولُونَ",
-                "وَاجْعَل لِّي لِسَانَ صِدْقٍ فِي الْآخِرِينَ",
-                "وَأَنِيبُوا إِلَىٰ رَبِّكُمْ وَأَسْلِمُوا لَهُ",
-                "وَاللَّهُ يَقْضِي بِالْحَقِّ",
-                "وَاللَّهُ يَعْلَمُ وَأَنتُمْ لَا تَعْلَمُونَ",
-                "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",
-                "وَهُوَ عَلَىٰ جَمْعِهِمْ إِذَا يَشَاءُ قَدِيرٌ",
-                "وَمَن أَصْدَقُ مِنَ اللَّهِ حَدِيثًا",
-                "إِنَّ اللَّهَ يُحِبُّ الَّذِينَ يُقَاتِلُونَ فِي سَبِيلِهِ صَفًّا",
-                "لَا خَوْفٌ عَلَيْهِمْ وَلَا هُمْ يَحْزَنُونَ",
                 "قُل لَّن يُصِيبَنَا إِلَّا مَا كَتَبَ اللَّهُ لَنَا",
-                "إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ وَيُحِبُّ الْمُتَطَهِّرِينَ",
-                "قَدْ أَفْلَحَ مَن تَزَكَّىٰ",
-                "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
-                "لِّمَن شَاءَ مِنكُمْ أَن يَتَقَدَّمَ أَوْ يَتَأَخَّرَ",
-                
-                // إضافة 50 آية جديدة
-                "فَاسْتَجَبْنَا لَهُ وَنَجَّيْنَاهُ مِنَ الْغَمِّ", 
-                "إِنَّ الْحَسَنَاتِ يُذْهِبْنَ السَّيِّئَاتِ",
-                "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
-                "وَمَا النَّصْرُ إِلَّا مِنْ عِندِ اللَّهِ",
-                "أَفَلَا يَتَدَبَّرُونَ الْقُرْآنَ",
-                "وَاذْكُر رَّبَّكَ إِذَا نَسِيتَ",
-                "وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ",
-                "وَسَيَعْلَمُ الَّذِينَ ظَلَمُوا أَيَّ مُنقَلَبٍ يَنقَلِبُونَ",
-                "فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ",
-                "وَتِلْكَ الْأَيَّامُ نُدَاوِلُهَا بَيْنَ النَّاسِ",
-                "إِنَّ اللَّهَ يُحِبُّ الْمُتَوَكِّلِينَ",
-                "وَاصْبِرْ وَمَا صَبْرُكَ إِلَّا بِاللَّهِ",
-                "عَلَيْكُمْ أَنفُسَكُمْ لَا يَضُرُّكُم مَّن ضَلَّ إِذَا اهْتَدَيْتُمْ",
-                "وَلَا تَقُولُوا لِمَن يُقْتَلُ فِي سَبِيلِ اللَّهِ أَمْوَاتٌ ۚ بَلْ أَحْيَاءٌ",
-                "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ الْأَعْلَوْنَ إِن كُنتُم مُّؤْمِنِينَ",
-                "إِنَّمَا يُوَفَّى الصَّابِرُونَ أَجْرَهُم بِغَيْرِ حِسَابٍ",
-                "وَمَن يُطِعِ اللَّهَ وَرَسُولَهُ فَقَدْ فَازَ فَوْزًا عَظِيمًا",
-                "وَالَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ لَهُمْ جَنَّاتٌ تَجْرِي مِن تَحْتِهَا الْأَنْهَارُ",
-                "قُلْ هَلْ يَسْتَوِي الَّذِينَ يَعْلَمُونَ وَالَّذِينَ لَا يَعْلَمُونَ",
-                "وَالْعَاقِبَةُ لِلْمُتَّقِينَ",
-                "وَأَمَّا مَنْ خَافَ مَقَامَ رَبِّهِ وَنَهَى النَّفْسَ عَنِ الْهَوَىٰ",
-                "فَالَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ لَهُمْ مَغْفِرَةٌ وَرِزْقٌ كَرِيمٌ",
-                "وَلَا تَبْخَسُوا النَّاسَ أَشْيَاءَهُمْ",
-                "وَاذْكُرُوا نِعْمَةَ اللَّهِ عَلَيْكُمْ",
-                "قَدْ جَعَلَ اللَّهُ لِكُلِّ شَيْءٍ قَدْرًا",
-                "وَمَا كَانَ اللَّهُ مُعَذِّبَهُمْ وَهُمْ يَسْتَغْفِرُونَ",
-                "أَلَيْسَ اللَّهُ بِكَافٍ عَبْدَهُ",
-                "وَقُولُوا قَوْلًا سَدِيدًا",
-                "وَلَا تُفْسِدُوا فِي الْأَرْضِ بَعْدَ إِصْلَاحِهَا",
-                "وَمَن يُؤْمِن بِاللَّهِ يَهْدِ قَلْبَهُ",
-                "إِنَّا لَنَنصُرُ رُسُلَنَا وَالَّذِينَ آمَنُوا فِي الْحَيَاةِ الدُّنْيَا",
-                "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ",
-                "وَاخْفِضْ لَهُمَا جَنَاحَ الذُّلِّ مِنَ الرَّحْمَةِ",
-                "وَاصْبِرْ عَلَىٰ مَا أَصَابَكَ",
-                "إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنفُسِهِمْ",
-                "وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ",
-                "وَمَا خَلَقْتُ الْجِنَّ وَالْإِنسَ إِلَّا لِيَعْبُدُونِ",
-                "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَكُن مِّنَ السَّاجِدِينَ",
-                "وَهُوَ الْغَفُورُ الْوَدُودُ",
-                "وَمِنْ آيَاتِهِ خَلْقُ السَّمَاوَاتِ وَالْأَرْضِ",
-                "الَّذِي أَحْسَنَ كُلَّ شَيْءٍ خَلَقَهُ",
-                "إِنَّ رَبَّكَ لَبِالْمِرْصَادِ",
-                "وَقُلِ اعْمَلُوا فَسَيَرَى اللَّهُ عَمَلَكُمْ",
-                "يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ",
-                "فَأَيْنَمَا تُوَلُّوا فَثَمَّ وَجْهُ اللَّهِ",
-                "وَأْمُرْ بِالْمَعْرُوفِ وَانْهَ عَنِ الْمُنكَرِ",
-                "وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ",
-                "أَلَا إِنَّ أَوْلِيَاءَ اللَّهِ لَا خَوْفٌ عَلَيْهِمْ وَلَا هُمْ يَحْزَنُونَ",
-                "وَلَا تَيْأَسُوا مِن رَّوْحِ اللَّهِ",
-                "وَأَنِ اشْكُرْ لِي وَلِوَالِدَيْكَ",
-                "وَأَطِيعُوا اللَّهَ وَأَطِيعُوا الرَّسُولَ",
-                "وَاللَّهُ خَيْرٌ وَأَبْقَىٰ"
+                "إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنفُسِهِمْ"
             ];
 
             function getRandomVerse() {
-                // دالة الاختيار العشوائي: تختار مؤشرًا عشوائيًا تمامًا من بين الـ 100 آية
                 const randomIndex = Math.floor(Math.random() * quranicVerses.length);
                 return quranicVerses[randomIndex];
+            }
+            
+            /* ------------------------------------------------------------------ */
+            /* دالة تحديث الألوان الرئيسية (باستخدام فئات Tailwind المباشرة) */
+            /* ------------------------------------------------------------------ */
+            function updateThemeElements(themeName) {
+                // إزالة فئات الثيمات السابقة
+                const currentThemeClasses = ['text-yellow-600', 'text-yellow-700', 'text-yellow-800', 'bg-yellow-600', 'hover:bg-yellow-500', 'focus:ring-yellow-600', 'focus:border-yellow-600', 'text-pink-600', 'text-pink-700', 'text-pink-800', 'bg-pink-600', 'hover:bg-pink-500', 'focus:ring-pink-600', 'focus:border-pink-600', 'bg-pink-100', 'border-pink-400', 'text-pink-800', 'bg-yellow-100', 'border-yellow-400', 'text-yellow-800'];
+                
+                // تنظيف فئات العناصر
+                mainTitle.classList.remove(...currentThemeClasses);
+                verseText1.classList.remove(...currentThemeClasses);
+                verseText2.classList.remove(...currentThemeClasses);
+                taskInput.classList.remove(...currentThemeClasses);
+                addTaskBtn.classList.remove(...currentThemeClasses);
+                errorMessage.classList.remove('bg-pink-100', 'border-pink-400', 'text-pink-800', 'bg-yellow-100', 'border-yellow-400', 'text-yellow-800');
+                
+                // تحديد فئات الثيم الجديدة
+                if (themeName === 'pink-theme') {
+                    // تطبيق ألوان الوردي
+                    mainTitle.classList.add('text-pink-600');
+                    verseText1.classList.add('text-pink-700');
+                    verseText2.classList.add('text-pink-800');
+                    taskInput.classList.add('focus:ring-pink-600', 'focus:border-pink-600');
+                    addTaskBtn.classList.add('bg-pink-600', 'hover:bg-pink-500', 'focus:ring-pink-600');
+                    errorMessage.classList.add('bg-pink-100', 'border-pink-400', 'text-pink-800');
+                    
+                    // تحديث ألوان الآيات داخل المهام الموجودة
+                    document.querySelectorAll('.verse-element').forEach(el => {
+                        el.classList.remove('text-yellow-600');
+                        el.classList.add('text-pink-600');
+                    });
+                    
+                } else {
+                    // تطبيق ألوان الذهبي (الافتراضية)
+                    mainTitle.classList.add('text-yellow-600');
+                    verseText1.classList.add('text-yellow-700');
+                    verseText2.classList.add('text-yellow-800');
+                    taskInput.classList.add('focus:ring-yellow-600', 'focus:border-yellow-600');
+                    addTaskBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-500', 'focus:ring-yellow-600');
+                    errorMessage.classList.add('bg-yellow-100', 'border-yellow-400', 'text-yellow-800');
+                    
+                    // تحديث ألوان الآيات داخل المهام الموجودة
+                    document.querySelectorAll('.verse-element').forEach(el => {
+                        el.classList.remove('text-pink-600');
+                        el.classList.add('text-yellow-600');
+                    });
+                }
+            }
+
+
+            function setTheme(themeName) {
+                // 1. تحديث الكلاس على الـ body لتغيير الخلفية والعناصر العائمة
+                body.classList.remove('gold-theme', 'pink-theme');
+                body.classList.add(themeName);
+                
+                // 2. تحديث الألوان الرئيسية للعناصر (باستخدام الدالة الجديدة)
+                updateThemeElements(themeName);
+
+                // 3. حفظ الاختيار في المتصفح
+                localStorage.setItem('appTheme', themeName);
             }
 
             function showErrorMessage(message) {
@@ -260,43 +280,66 @@
                     return; 
                 }
                 
-                // اختيار آية عشوائية
                 const randomVerse = getRandomVerse();
+                const currentTheme = body.classList.contains('pink-theme') ? 'pink' : 'yellow';
 
-                // إنشاء عنصر القائمة (li) بالتصميم الجديد
+                // إنشاء عنصر القائمة (li)
                 const li = document.createElement('li');
-                li.className = 'flex items-start justify-between bg-gray-800 p-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-[1.02]';
+                li.className = 'flex items-start justify-between bg-gray-100 p-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-[1.02] shadow-sm';
 
-                // حاوية النص والآية لمرونة العرض
+                // حاوية النص والآية
                 const textContainer = document.createElement('div');
                 textContainer.className = 'flex flex-col sm:flex-row items-start sm:items-center flex-grow';
 
-                // إنشاء عنصر النص (span) بالتصميم الجديد
+                // إنشاء عنصر النص (span)
                 const taskSpan = document.createElement('span');
                 taskSpan.textContent = taskText;
-                taskSpan.className = 'task-text text-gray-100 cursor-pointer text-lg mb-1 sm:mb-0';
+                taskSpan.className = 'task-text text-gray-900 cursor-pointer text-lg mb-1 sm:mb-0'; 
                 taskSpan.style.fontFamily = 'Amiri, serif';
                 
-                // إنشاء عنصر الآية الملهمة
+                // إنشاء عنصر الآية الملهمة (يأخذ اللون من الثيم الحالي)
                 const verseElement = document.createElement('small');
-                // نستخدم ﴿ و ﴾ لتمثيل علامات الآيات
                 verseElement.textContent = `﴿${randomVerse}﴾`;
-                // تصميم ذهبي صغير وغير مزعج
-                verseElement.className = 'text-yellow-500 text-opacity-75 text-xs italic sm:mr-3 whitespace-nowrap';
+                verseElement.className = `verse-element text-${currentTheme}-600 text-opacity-75 text-xs italic sm:mr-3 whitespace-nowrap`;
                 verseElement.style.fontFamily = 'Amiri, serif';
+                
+                // حاوية الأزرار
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'flex items-center space-x-2 space-x-reverse ml-3'; 
 
-                // تعديل حدث النقر لتطبيق الشطب الناعم
-                taskSpan.addEventListener('click', () => {
-                    taskSpan.classList.toggle('completed-task'); 
-                    li.classList.toggle('bg-gray-700'); 
-                });
+                // 1. زر "تم بحمد الله" (يستخدم أيضاً للتراجع)
+                const completeBtn = document.createElement('button');
+                completeBtn.textContent = 'تم بحمد الله';
+                completeBtn.className = 'text-sm text-green-600 hover:text-green-800 font-semibold transition whitespace-nowrap'; 
 
-                // زر الحذف (button)
+                // 2. زر "حذف"
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = 'حذف';
-                deleteBtn.className = 'flex-shrink-0 text-red-500 hover:text-red-700 font-semibold text-sm transition mr-3'; 
-                
-                // **الإصلاح: إضافة وظيفة حذف العنصر بالكامل**
+                deleteBtn.className = 'text-sm text-red-500 hover:text-red-700 font-semibold transition whitespace-nowrap'; 
+
+                // منطق الإكمال (زر "تم بحمد الله")
+                completeBtn.addEventListener('click', () => {
+                    const isCompleted = taskSpan.classList.toggle('completed-task'); 
+                    
+                    // تحديث خلفية الـ li بلون خفيف
+                    if (currentTheme === 'pink') {
+                         li.classList.toggle('bg-rose-50'); 
+                    } else {
+                         li.classList.toggle('bg-green-50'); 
+                    }
+                    
+                    if (isCompleted) {
+                        completeBtn.textContent = 'تراجع';
+                        // استخدام اللون العكسي (لون الثيم) لزر التراجع
+                        completeBtn.className = `text-sm theme-btn-reverse text-${currentTheme}-600 font-semibold transition whitespace-nowrap`; 
+                    } else {
+                        completeBtn.textContent = 'تم بحمد الله';
+                        // العودة إلى اللون الأخضر للإنجاز
+                        completeBtn.className = 'text-sm text-green-600 hover:text-green-800 font-semibold transition whitespace-nowrap'; 
+                    }
+                });
+
+                // منطق الحذف (زر "حذف")
                 deleteBtn.addEventListener('click', () => {
                     li.remove();
                 });
@@ -305,13 +348,24 @@
                 textContainer.appendChild(taskSpan);
                 textContainer.appendChild(verseElement);
                 
+                buttonsContainer.appendChild(completeBtn);
+                buttonsContainer.appendChild(deleteBtn);
+                
                 li.appendChild(textContainer);
-                li.appendChild(deleteBtn);
+                li.appendChild(buttonsContainer);
                 taskList.appendChild(li);
 
                 taskInput.value = '';
                 taskInput.focus();
             }
+
+            // تحميل الثيم عند بدء التشغيل
+            const savedTheme = localStorage.getItem('appTheme') || 'gold-theme';
+            setTheme(savedTheme);
+
+            // إضافة المستمعين للأزرار
+            setPinkThemeBtn.addEventListener('click', () => setTheme('pink-theme'));
+            setGoldThemeBtn.addEventListener('click', () => setTheme('gold-theme'));
 
             addTaskBtn.addEventListener('click', addTask);
             taskInput.addEventListener('keydown', (e) => {
